@@ -9,8 +9,11 @@ import React, {
   StyleSheet,
   Text,
   View,
-  ListView
+  ListView,
+  Navigator
 } from 'react-native';
+
+import Button from 'react-native-button';
 
 class SongListView extends Component {
   constructor(props) {
@@ -22,32 +25,67 @@ class SongListView extends Component {
     };
   }
 
+  chooseSong() {
+    this.props.navigator.push({id: 2});
+  }
+
+  renderRow(data) {
+    let chooseSong = this.chooseSong.bind(this);
+    return (
+      <View>
+        <Text>{data}</Text>
+        <Button onPress={chooseSong}>Use this Song</Button>
+      </View>
+    );
+  }
+
   render() {
     return (
-      <ListView
-        dataSource={this.state.dataSource}
-        renderRow={(data) => <Text>{data}</Text>}
-      />
+      <View>
+        <ListView
+          dataSource={this.state.dataSource}
+          renderRow={this.renderRow.bind(this)}
+        />
+      </View>
+    );
+  }
+}
+
+class SongView extends Component {
+  _goBack() {
+    this.props.navigator.pop();
+  }
+
+  render() {
+    let goBack = this._goBack.bind(this);
+    return (
+      <View>
+        <Text>Song View</Text>
+        <Button onPress={goBack}>Back to list view</Button>
+      </View>
     );
   }
 }
 
 class DewDrop extends Component {
+  _renderScene(route, navigator) {
+    if (route.id === 1) {
+      return (
+        <SongListView navigator={navigator} />
+      );
+    } else if (route.id === 2) {
+      return (
+        <SongView navigator={navigator} />
+      );
+    }
+  }
+
   render() {
     return (
-      <View style={styles.container}>
-        <Text style={styles.welcome}>
-          Welcome to React Native!
-        </Text>
-        <SongListView />
-        <Text style={styles.instructions}>
-          To get started, edit index.ios.js
-        </Text>
-        <Text style={styles.instructions}>
-          Press Cmd+R to reload,{'\n'}
-          Cmd+D or shake for dev menu
-        </Text>
-      </View>
+      <Navigator
+        initialRoute={{id: 1}}
+        renderScene={this._renderScene}
+      />
     );
   }
 }
